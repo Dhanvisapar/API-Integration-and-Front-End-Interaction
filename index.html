@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Task 5</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #9fbe56;
+      padding: 30px;
+    }
+    input, button {
+      padding: 8px;
+      margin: 5px;
+    }
+    li {
+      margin: 5px 0;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>Task 5: API Integration</h1>
+
+<input id="itemInput" placeholder="Enter item">
+<button onclick="addItem()">Add</button>
+
+<ul id="list"></ul>
+
+<script>
+const list = document.getElementById("list");
+
+function loadItems() {
+  fetch("/api/items")
+    .then(res => res.json())
+    .then(data => {
+      list.innerHTML = "";
+      data.forEach(item => {
+        list.innerHTML += `
+          <li>
+            ${item.name}
+            <button onclick="deleteItem(${item.id})">Delete</button>
+          </li>
+        `;
+      });
+    });
+}
+
+function addItem() {
+  const name = document.getElementById("itemInput").value;
+
+  fetch("/api/items", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name })
+  })
+  .then(() => {
+    document.getElementById("itemInput").value = "";
+    loadItems();
+  });
+}
+
+function deleteItem(id) {
+  fetch(`/api/items/${id}`, { method: "DELETE" })
+    .then(() => loadItems());
+}
+
+loadItems();
+</script>
+
+</body>
+</html>
